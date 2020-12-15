@@ -1,0 +1,7 @@
+{
+    "batch_size": 64,
+    "input_channels" : 6,
+    "output_channels" : 6,
+    "embedding_size": 256,
+    "normalize": false,
+}
