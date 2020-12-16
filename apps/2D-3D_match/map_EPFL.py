@@ -284,9 +284,10 @@ def open_and_encode_depth_map(rgb, depth, intrinsics):
     descriptors = encode_3D(patches, pointnet, batch_size=128, device=device)
     return img, keypoints2_3D, keypoints2_3D_2, descriptors, pcd
 
+def open_and_encode_point_cloud():
 
 #Manual Parameters
-if(MANUAL_INPUT):
+if (MANUAL_INPUT) :
     rgb, rgb2, depth2, intrinsics = manual_inputs()
 
 img1, source_array, keypoints, descriptors = open_and_encode_2D(rgb)
@@ -301,5 +302,5 @@ for elem in matches:
 
     correspondences.append((train_real_idx,keypoints2_3D_2[elem.trainIdx]))
 
-lineset = o3d.geometry.create_line_set_from_point_cloud_correspondences(pcimg1,pcd,correspondences[:15])
+lineset = o3d.geometry.create_line_set_from_point_cloud_correspondences(pcimg1,downsampled,correspondences[:15])
 o3d.visualization.draw_geometries([pcimg1, pcd, lineset])
