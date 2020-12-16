@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--pairfile', help='path to file containing the 3d matching')
 args = parser.parse_args()
 
-threshold = 5000
+threshold = 10
 
 pairfile = args.pairfile
 
