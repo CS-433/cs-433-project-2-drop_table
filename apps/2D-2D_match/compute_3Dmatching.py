@@ -118,7 +118,7 @@ for image_nb0, image_nb1 in tqdm(images_pairs, desc='[Computation of 3D matches]
 
     for match in matches:
         index_query0, index_query1 = keypts0[match.queryIdx].pt
-        index_train0, index_train1 = keypts0[match.trainIdx].pt
+        index_train0, index_train1 = keypts1[match.trainIdx].pt
 
         pair = np.hstack((pc0[int(index_query1), int(index_query0)], pc1[int(index_train1), int(index_train0)]))
 
