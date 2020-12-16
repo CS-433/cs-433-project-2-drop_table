@@ -11,7 +11,7 @@ from matplotlib.patches import ConnectionPatch
 from PIL import Image
 import glob
 import open3d as o3d
-#from map_EPFL import *
+
 sys.path.append('.')
 from lcd.models import *
 from lcd import *
@@ -19,7 +19,7 @@ from lcd import *
 parser = argparse.ArgumentParser()
 parser.add_argument('--logdir', help='path to the log directory')
 parser.add_argument('--imagesdir', help='path to the images directory')
-parser.add_argument("--voxel_size", default=20, type=float)
+parser.add_argument("--voxel_size", default=2, type=float)
 parser.add_argument("--radius", default=540, type=float)
 parser.add_argument("--num_points", default=1024, type=int)
 
@@ -29,7 +29,6 @@ logdir = parse_args.logdir
 config = os.path.join(logdir, 'config.json')
 config = json.load(open(config))
 device = config['device']
-# device = "cpu"
 fname = os.path.join(logdir, 'model.pth')
 print('> Loading model from {}....'.format(fname))
 patchnet = PatchNetAutoencoder(
@@ -38,7 +37,6 @@ patchnet = PatchNetAutoencoder(
 )
 patchnet.load_state_dict(torch.load(fname)['patchnet'])
 patchnet.to(device)
-# patchnet.load_state_dict(torch.load(fname, map_location=torch.device(device))["patchnet"])
 patchnet.eval()
 
 
@@ -52,7 +50,6 @@ pointnet = PointNetAutoencoder(
 
 pointnet.load_state_dict(torch.load(fname)['pointnet'])
 pointnet.to(device)
-# pointnet.load_state_dict(torch.load(fname, map_location=torch.device(device))["pointnet"])
 pointnet.eval()
 
 num_samples = 1024
@@ -122,47 +119,22 @@ def open_image(rgb_file):
     img1 = cv.cvtColor(img1,cv.COLOR_BGR2RGB) # queryImage
     return img1, source, source_array
 
-def from_2D_image_in_3D_space(source_array):
-    img1_points = []
-    img1_colors = []
-    pcimg1 = o3d.geometry.PointCloud()
-    for i in range(source_array.shape[0]):
-        for j in range(source_array.shape[1]):
-            img1_points.append([i,j,0])
-            img1_colors.append(source_array[i][j]/255)
-    img1_colors = np.delete(img1_colors,3,axis=1)
-    pcimg1.points = o3d.utility.Vector3dVector(img1_points)
-    pcimg1.colors = o3d.utility.Vector3dVector(img1_colors)
-    pcimg1.translate((-source_array.shape[0]/2, -source_array.shape[1]/2, 0))
-    pcimg1.scale(-1, center=True)
-    #pcimg1.translate((source_array.shape[0]/2, source_array.shape[1]/2, 0))
-    pcimg1.rotate([0, -np.pi / 4, 0], center=True)
-    pcimg1.scale(20, center=True)
-    #pcimg1.transform([[1,0,0,0], [0,-1,0,0], [0,0,1,0], [0,0,0,1]])
-    pcimg1.translate((4374723,540817, 4595214))
-    pcimg1.translate((0,0,5000))
-    #indices, points,colors, pcd = depth_map_to_point_cloud(intrinsics, rgb2, depth2, display = False)
-    #o3d.visualization.draw_geometries([pcimg1,pcd])
-    return pcimg1
-
 imagesdir = parse_args.imagesdir
 
-images_pairs = list(zip(range(3, 4), range(4, 5)))
-
-i = 0
+images_pairs = list(zip(range(0, 100), range(1, 101)))
 
 all_matches = np.empty((0,6), int)
 
 for image_nb0, image_nb1 in tqdm(images_pairs, desc='[Computation of 3D matches]'):
-    # image_path0 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb0))[0]
-    # image_path1 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb1))[0]
 
-    image_path0 = glob.glob(imagesdir + "/*_{:04d}_f2_img.png".format(image_nb0))[0]
-    image_path1 = glob.glob(imagesdir + "/*_{:04d}_f2_img.png".format(image_nb1))[0]
+    image_path0 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb0))[0]
+    image_path1 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb1))[0]
+
+    # image_path0 = glob.glob(imagesdir + "/*_{:04d}_f2_img.png".format(image_nb0))[0]
+    # image_path1 = glob.glob(imagesdir + "/*_{:04d}_f2_img.png".format(image_nb1))[0]
 
     color0 = cv.imread(image_path0)
     color0 = cv.cvtColor(color0,cv.COLOR_BGR2RGB)
-    color1 = cv.imread(image_path1)
     color1 = cv.imread(image_path1)
     color1 = cv.cvtColor(color1,cv.COLOR_BGR2RGB)
 
@@ -171,7 +143,6 @@ for image_nb0, image_nb1 in tqdm(images_pairs, desc='[Computation of 3D matches]
     pc1 = np.load(image_path1.replace("img.png", "pc.npy"))
     
     img1, source, source_array = open_image(image_path0)
-    pc01 = from_2D_image_in_3D_space(source_array)
 
 
     # Point Cloud
@@ -184,8 +155,6 @@ for image_nb0, image_nb1 in tqdm(images_pairs, desc='[Computation of 3D matches]
     
     downsampled, patches1 = extract_uniform_patches(pcd, parse_args.voxel_size, parse_args.radius, parse_args.num_points)
     keypts1 = downsampled.points
-
-    o3d.visualization.draw_geometries([downsampled])
 
     desc1 = encode_3D(patches1, pointnet, batch_size=124, device=device)
 
@@ -205,12 +174,6 @@ for image_nb0, image_nb1 in tqdm(images_pairs, desc='[Computation of 3D matches]
 
     desc0 = compute_lcd_descriptors(patches0, patchnet, batch_size=256, device=device)
 
-
-
-    # Matching
-    #keypts0 = cv.KeyPoint_convert(keypts0)
-    #keypts1 = cv.KeyPoint_convert(keypts1)
-
     bf = cv.BFMatcher()
     matches = bf.match(desc0, desc1)
     matches = sorted(matches, key=lambda x:x.distance)
@@ -223,21 +186,7 @@ for image_nb0, image_nb1 in tqdm(images_pairs, desc='[Computation of 3D matches]
 
         all_matches = np.vstack((all_matches, pair))
 
-
-    correspondences = []
-    for elem in matches:
-        print(elem.trainIdx)
-        print(keypts0[elem.queryIdx])
-        train_real_idx = keypts0[elem.queryIdx][1]* source_array.shape[1] + keypts0[elem.queryIdx][0]
-
-        correspondences.append((train_real_idx,elem.trainIdx))
-
-    lineset = o3d.geometry.create_line_set_from_point_cloud_correspondences(pc01,downsampled,correspondences[:15])
-    o3d.visualization.draw_geometries([pc01, downsampled, lineset])
-    
-    i = i + 1
-
-save_file = "-D256_2D-3D"
+save_file = "-EPFL-synth_2D-3D"
 
 print("> Saving matches to {}".format(imagesdir+save_file))
 np.save(imagesdir+save_file, all_matches)
