@@ -64,13 +64,13 @@ def compute_lcd_descriptors(patches, model, batch_size, device):
 
 imagesdir = parse_args.imagesdir
 
-images_pairs = list(zip(range(1, 100), range(1,101)))
+images_pairs = list(zip(range(1, 101), range(2, 102)))
 
 i = 0
 
 all_matches = np.empty((0,6), int)
 
-for image_nb0, image_nb1 in tqdm(images_pairs, desc='[{}]'.format(i)):
+for image_nb0, image_nb1 in tqdm(images_pairs, desc='[Computation of 3D matches]'):
 
     # image_path0 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb0))[0]
     # image_path1 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb1))[0]
@@ -126,7 +126,7 @@ for image_nb0, image_nb1 in tqdm(images_pairs, desc='[{}]'.format(i)):
 
     i = i + 1
 
-save_file = "/pred-D256.npz"
+save_file = "-D256"
 
 print("> Saving matches to {}".format(imagesdir+save_file))
 np.save(imagesdir+save_file, all_matches)

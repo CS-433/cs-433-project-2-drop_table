@@ -9,7 +9,6 @@ import matplotlib.pyplot as plt
 from PIL import Image
 from scipy.spatial import KDTree
 
-
 parser = argparse.ArgumentParser()
 parser.add_argument('--pairfile', help='path to file containing the 3d matching')
 args = parser.parse_args()
