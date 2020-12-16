@@ -64,7 +64,7 @@ def compute_lcd_descriptors(patches, model, batch_size, device):
 
 imagesdir = parse_args.imagesdir
 
-images_pairs = list(zip(range(1, 101), range(2, 102)))
+images_pairs = list(zip(range(1, 100), range(2, 101)))
 
 i = 0
 
