@@ -19,7 +19,7 @@ from lcd import *
 parser = argparse.ArgumentParser()
 parser.add_argument('--logdir', help='path to the log directory')
 parser.add_argument('--imagesdir', help='path to the images directory')
-parser.add_argument("--voxel_size", default=2, type=float)
+parser.add_argument("--voxel_size", default=100, type=float)
 parser.add_argument("--radius", default=540, type=float)
 parser.add_argument("--num_points", default=1024, type=int)
 
@@ -121,17 +121,17 @@ def open_image(rgb_file):
 
 imagesdir = parse_args.imagesdir
 
-images_pairs = list(zip(range(0, 100), range(1, 101)))
+images_pairs = list(zip(range(1, 100), range(2, 101)))
 
 all_matches = np.empty((0,6), int)
 
 for image_nb0, image_nb1 in tqdm(images_pairs, desc='[Computation of 3D matches]'):
 
-    image_path0 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb0))[0]
-    image_path1 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb1))[0]
+    # image_path0 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb0))[0]
+    # image_path1 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb1))[0]
 
-    # image_path0 = glob.glob(imagesdir + "/*_{:04d}_f2_img.png".format(image_nb0))[0]
-    # image_path1 = glob.glob(imagesdir + "/*_{:04d}_f2_img.png".format(image_nb1))[0]
+    image_path0 = glob.glob(imagesdir + "/*_{:04d}_f2_img.png".format(image_nb0))[0]
+    image_path1 = glob.glob(imagesdir + "/*_{:04d}_f2_img.png".format(image_nb1))[0]
 
     color0 = cv.imread(image_path0)
     color0 = cv.cvtColor(color0,cv.COLOR_BGR2RGB)
