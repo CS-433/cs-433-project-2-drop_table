@@ -7,7 +7,6 @@ import numpy as np
 from PIL import Image
 from tqdm import tqdm
 import cv2
-from skimage.util.shape import view_as_windows
 from matplotlib import cm
 import h5py
 import glob

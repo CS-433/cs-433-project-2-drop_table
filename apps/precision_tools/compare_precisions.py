@@ -1,14 +1,7 @@
-import os
-import sys
-import json
-from tqdm import tqdm
 import argparse
-import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
-from PIL import Image
-from scipy.spatial import KDTree
 import glob
 
 
