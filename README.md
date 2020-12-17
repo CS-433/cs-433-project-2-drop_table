@@ -144,7 +144,7 @@ Example :
 
     python3 -m apps.precision_tools.compute_precisions --pairfile precisions/2D-3D/comballaz/comballaz-prec-comballaz-mix.npy --threshold 200
 
-**compute_precisions** : Compute the precision for all files in a folder and compare them in a figure
+**compare_precisions** : Compute the precision for all files in a folder and compare them in a figure
 
 Usage :
 
