@@ -70,13 +70,15 @@ Example :
 
 ## 2D-3D match
 
-**compute_2D_3D_matching_3D_match** : Compute matches for all 2 consecutives images and pointcloud in a specified folder and store all the found matches in a numpy persistant file
+**compute_2D_3D_matching_3D_match** : Compute matches between an image and a depth image both from the 3D match dataset, the configurations are donne inside the script
 
 Usage :
 
+    python -m apps.2D-3D_match.compute_2D_3D_matching_3D_match --logdir [log_dir]
 
 Example :
 
+    python -m apps.2D-3D_match.compute_2D_3D_matching_3D_match --logdir logs\LCD-D256
 
 **compute_2D_3D_matching** : Compute matches beetween an image and a colored point cloud
 
@@ -86,15 +88,42 @@ Usage :
 
 Example :
 
-    python3 -m apps.2D-3D_match.compute_2D_3D_matching.py samples/comballaz-air2_5_DJI_0003_f2_img.png samples/comballaz-air2_7_DJI_0004_f2_img.png samples/comballaz-air2_5_DJI_0003_f2_pc.npy --logdir logs/LCD-comballaz-mix --voxel_size 300 --radius 80 --num_points 1024
+    python3 -m apps.2D-3D_match.compute_2D_3D_matching.py samples/comballaz-air2_5_DJI_0003_f2_img.png samples/comballaz-air2_7_DJI_0004_f2_img.png samples/comballaz-air2_5_DJI_0003_f2_pc.npy --logdir logs/LCD-comballaz-mix --voxel_size 30 --radius 80 --num_points 1024
 
 **compute_2D_3D_matching_precision** : Compute matches for all 2 consecutives images and pointcloud in a specified folder and store all the found matches in a numpy persistant file
 
 Usage :
 
+    python -m apps.2D-3D_match.compute_2D_3D_matching_precision --logdir [path_to_log_dir] --imagesdir [path_to_image_dir] --save_file [name_of_the_output_file]
 
 
 Example :
+    
+    python -m apps.2D-3D_match.compute_2D_3D_matching_precision --logdir logs\LCD-comballaz_synth --imagesdir comballaz-trajectory --save_file comballaz-D256
 
 
-## sparse to dense point cloud
+
+## Sparse to dense point cloud
+
+
+## Precisions Tools
+
+**compute_precisions** : Compute the precision of the matches contained in a npy file
+
+Usage :
+
+    python3 -m apps.precision_tools.compute_precisions.py --pairfile [path_to_the_npy_file] --threshold [threshold_for_valid_distances]
+
+Example :
+
+    python3 -m apps.precision_tools.compute_precisions.py --pairfile precisions/2D-3D/comballaz/comballaz-prec-comballaz-mix.npy --threshold 200
+
+**compute_precisions** : Compute the precision for all files in a folder and compare them in a figure
+
+Usage :
+
+    python3 -m apps.precision_tools.compare_precisions.py --dir [path_to_the_npy_file] --threshold_max [threshold_maximum for a range] --step [step for a range]
+
+Example :
+
+    python3 -m apps.precision_tools.compare_precisions.py --dir precisions/2D-3D/comballaz/ --threshold_max 2000 --step 1
