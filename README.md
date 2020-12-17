@@ -40,6 +40,23 @@ Additionnaly to the authors's pretrained network, you can find in the folder log
 # How to run the applications
 
 ## 2D-2D match
+**compute_2D_2D_matching** : Compute and display the best matches between 2 images
+
+Usage :
+    
+    python3 apps.2D-2D_match.compute_2D_2D_matching.py [path_to_src] [path_to_dst] --logdir [path_to_log] --number_of_matches [nb_of_matches]
+
+Example :
+    
+    python3 apps.2D-2D_match.compute_2D_2D_matching.py samples/comballaz-air2_5_DJI_0003_f2_img.png samples/comballaz-air2_7_DJI_0004_f2_img.png --logdir logs/LCD-comballaz-mix --number_of_matches 20
+
+**compute_2D_2D_matching_precision** : Compute matches for all 2 consecutives files in a specified folders and store all the found matches in a numpy persistant file.
+
+Usage : 
+
+    python3 apps.2D-2D_match.compute_2D_2D_matching_precision.py --logdir [path_to_log] --imagesdir [path_to_img_folder] --save_file [name_of_numpy_file] --dataset [EPFL or Comballaz]
+
+Example : 
 
 ## 2D-3D match
 

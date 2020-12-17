@@ -13,7 +13,6 @@ import h5py
 import glob
 from sklearn.neighbors import KDTree
 import sys
-
 sys.path.append('.')
 from lcd.models import *
 
@@ -25,10 +24,10 @@ args = parser.parse_args()
 logdir = args.logdir
 config = os.path.join(logdir, "config.json")
 config = json.load(open(config))
-
 device = config["device"]
-
 fname = os.path.join(logdir, "model.pth")
+
+# Load model patchnet
 print("Loading the LCD models ...")
 print("   > Loading patchnet from {}".format(fname))
 patchnet = PatchNetAutoencoder(
@@ -42,6 +41,7 @@ else:
     patchnet.load_state_dict(torch.load(fname, map_location=torch.device(device))["patchnet"])
 patchnet.eval()
 
+# Load model pointnet
 print("   > Loading pointnet from {}".format(fname))
 pointnet = PointNetAutoencoder(
     config["embedding_size"],
@@ -56,6 +56,8 @@ else:
     patchnet.load_state_dict(torch.load(fname, map_location=torch.device(device))["pointnet"])
 patchnet.eval()
 
+
+# Define the number of patches we want from each image
 num_samples = 3000
 
 def encode_2D(patches, patchnet, batch_size, device):
