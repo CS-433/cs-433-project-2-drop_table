@@ -15,7 +15,6 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--logdir', help='path to the log directory')
 parser.add_argument('--imagesdir', help='path to the images directory')
 parser.add_argument('--save_file', help='name of the file in which saving the ')
-parser.add_argument('--dataset', help='name of the dataset used : either EPFL or Comballaz')
 
 parse_args = parser.parse_args()
 
@@ -72,16 +71,21 @@ half_patch_size = 32
 
 
 imagesdir = parse_args.imagesdir
-images_pairs = list(zip(range(1, 100), range(2, 101)))
-i = 0
+
+if (parse_args.imagesdir == "epfl-trajectory"):
+    images_pairs = list(zip(range(0, 100), range(1, 101)))
+else:
+    images_pairs = list(zip(range(1, 100), range(2, 3)))
+
+
 all_matches = np.empty((0,6), int)
 # For all consecutive pair of file in the folder
 for image_nb0, image_nb1 in tqdm(images_pairs, desc='[Computation of 3D matches]'):
 
-    if (parse_args.dataset == "EPFL"):
+    if (parse_args.imagesdir == "epfl-trajectory"):
         image_path0 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb0))[0]
         image_path1 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb1))[0]
-    else
+    else:
         image_path0 = glob.glob(imagesdir + "/*_{:04d}_f2_img.png".format(image_nb0))[0]
         image_path1 = glob.glob(imagesdir + "/*_{:04d}_f2_img.png".format(image_nb1))[0]
     
@@ -139,10 +143,8 @@ for image_nb0, image_nb1 in tqdm(images_pairs, desc='[Computation of 3D matches]
 
         all_matches = np.vstack((all_matches, pair))
 
-    i = i + 1
-
 # Export the matches int a file
-save_file = "parse_args.save_file"
+save_file = "-"+parse_args.save_file
 
 print("> Saving matches to {}".format(imagesdir+save_file))
 np.save(imagesdir+save_file, all_matches)
