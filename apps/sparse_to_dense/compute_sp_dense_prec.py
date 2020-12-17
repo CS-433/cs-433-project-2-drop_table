@@ -18,6 +18,8 @@ from lcd.models import *
 parser = argparse.ArgumentParser()
 parser.add_argument('--logdir', help='path to the log directory')
 parser.add_argument('--imagesdir', help='path to the images directory')
+parser.add_argument('--save_file', help='name of the file in which saving the ')
+parser.add_argument("--num_points", default=3000, type=int)
 args = parser.parse_args()
 
 logdir = args.logdir
@@ -49,15 +51,15 @@ pointnet = PointNetAutoencoder(
     config["normalize"],
 )
 if(device == "cuda"):
-    patchnet.load_state_dict(torch.load(fname)['pointnet'])
-    patchnet.to(device)
+    pointnet.load_state_dict(torch.load(fname)['pointnet'])
+    pointnet.to(device)
 else:
-    patchnet.load_state_dict(torch.load(fname, map_location=torch.device(device))["pointnet"])
-patchnet.eval()
+    pointnet.load_state_dict(torch.load(fname, map_location=torch.device(device))["pointnet"])
+pointnet.eval()
 
 
 # Define the number of patches we want from each image
-num_samples = 3000
+num_samples = args.num_points
 
 def encode_2D(patches, patchnet, batch_size, device):
     batches = torch.tensor(patches, dtype=torch.float32)
@@ -69,7 +71,7 @@ def encode_2D(patches, patchnet, batch_size, device):
             print("   > Batch : ", i, "/" , len(batches))
             if(device == "cuda"):
                 x = x.to(device)
-            z = model.encode(x)
+            z = patchnet.encode(x)
             if(device == "cuda"):
                 z = z.cpu()
             z = z.numpy()
@@ -129,11 +131,17 @@ imagesdir = args.imagesdir
 
 all_matches = np.empty((0,12), int)
 
-for image_nb0 in tqdm(range(0, 100, 20), desc='[Computation of 3D matches]'):
+if (args.imagesdir == "epfl-trajectory"):
+    images = range(0, 100, 20)
+else:
+    images = range(1, 101, 20)
 
-    image_path0 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb0))[0]
+for image_nb0 in tqdm(images, desc='[Computation of 3D matches]'):
 
-    # image_path0 = glob.glob(imagesdir + "/*_{:04d}_f2_img.png".format(image_nb0))[0]
+    if (args.imagesdir == "epfl-trajectory"):
+        image_path0 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb0))[0]
+    else:
+        image_path0 = glob.glob(imagesdir + "/*_{:04d}_f2_img.png".format(image_nb0))[0]
 
     pc0 = np.load(image_path0.replace("img.png", "pc.npy"))
 
@@ -142,8 +150,6 @@ for image_nb0 in tqdm(range(0, 100, 20), desc='[Computation of 3D matches]'):
 
     keypts0 = []
     patches0 = []
-
-    # open3dcolors = []
 
     while len(keypts0) < num_samples:
         u0 = np.random.choice(color0.shape[1])
@@ -155,18 +161,12 @@ for image_nb0 in tqdm(range(0, 100, 20), desc='[Computation of 3D matches]'):
         kp0 = pc0[v0, u0]
         keypts0.append(kp0)
 
-        # open3dcolors.append(color0[v0, u0] / 255)
-
         patch0 = extract_color_patch(color0, u0, v0)
         patches0.append(patch0)
-
-    # draw_point_cloud(np.hstack((np.array(keypts0), np.array(open3dcolors))))
 
     pointcloud = get_descriptors_from_PNG(patches0)
 
     pc = assemble(pointcloud, keypts0, 100)
-    
-    # draw_point_cloud(pc)
 
     pc0 = pc0.reshape(pc0.shape[0] * pc0.shape[1], pc0.shape[2])
     color0 = color0.reshape(color0.shape[0] * color0.shape[1], color0.shape[2]) / 255
@@ -181,7 +181,7 @@ for image_nb0 in tqdm(range(0, 100, 20), desc='[Computation of 3D matches]'):
 
     all_matches = np.vstack((all_matches, pair))
 
-save_file = "-sparse-to-dense-EPFL-synth"
+save_file = "-"+args.save_file
 
 print("> Saving matches to {}".format(imagesdir+save_file))
 np.save(imagesdir+save_file, all_matches)
