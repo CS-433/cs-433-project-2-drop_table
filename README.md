@@ -57,6 +57,8 @@ Warning : With loading all data in the RAM and Nvidia v100 GPUs, the differents 
 
 We also provide a run.sh file designed to run the train.py script on EPFL's Izar cluster that run on slurm.
 
+The names followed by "light" are leftovers of our try to run the training using multiple GPUs in parallel. It sadly does not work as it is on the Izar cluster. To use it, one can simply temporarily rename the equivalent files or directory to another name, remove the "light" in all names and run with the same step as normal.
+
 For more informations on the training, the LCD paper also have informations.
 
 # How to use a pretrained network
