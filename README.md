@@ -28,7 +28,7 @@ To choose which version to train, simply rename the directory containing the sou
     matplotlib
     PIL
     glob
-    open3d-python
+    open3d-python (version 0.7.0)
     
 
 # How to train the Network
