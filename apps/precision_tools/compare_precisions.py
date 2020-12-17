@@ -1,14 +1,7 @@
-import os
-import sys
-import json
-from tqdm import tqdm
 import argparse
-import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
-from PIL import Image
-from scipy.spatial import KDTree
 import glob
 
 
@@ -34,7 +27,6 @@ def compute_distances(file):
 		else :		
 			predictions, true_value = matchings[:,:3], matchings[:, 6:9]
 			distances = np.sqrt(np.sum((predictions - true_value)**2, axis=1))
-			print("hehe")
 	else :
 		predictions, true_value = matchings[:,:3], matchings[:, 3:]
 		distances = np.sqrt(np.sum((predictions - true_value)**2, axis=1))
@@ -52,6 +44,7 @@ for elem in files_path:
 	name = name.replace(last,"")
 	rmv = "-".join(name.split("-")[:3])
 	name = name.replace(rmv+"-","")
+	name = name.replace("sparse-to-dense","")
 	plt.plot(x, y, label = name, linewidth=2)
 
 plt.tight_layout()
@@ -59,7 +52,6 @@ plt.xlabel('Treshold (in meter) for 2 points to be correctly matched')
 plt.ylabel('Percentage of correctly matched points')
 
 plt.legend()
-#plt.title(args.dir.split("/")[1])
 plt.show()
 
 

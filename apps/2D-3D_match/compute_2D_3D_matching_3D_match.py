@@ -6,7 +6,6 @@ import argparse
 import numpy as np
 from PIL import Image
 import cv2
-from skimage.util.shape import view_as_windows
 from matplotlib import cm
 import matplotlib.pyplot as plt
 import h5py
