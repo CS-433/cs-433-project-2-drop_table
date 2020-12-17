@@ -82,12 +82,11 @@ Example :
 
 Usage :
 
-python3 -m apps.2D-3D_match.compute_2D_3D_matching.py [source_img] [dest_img] [dest_point_cloud] --logdir [path_to_log_dir] --voxel_size [voxel_size] --radius [radius] --num_points [num_point]
+    python3 -m apps.2D-3D_match.compute_2D_3D_matching.py [source_img] [dest_img] [dest_point_cloud] --logdir [path_to_log_dir] --voxel_size [voxel_size] --radius [radius] --num_points [num_point]
 
 Example :
 
-python3 -m apps.2D-3D_match.compute_2D_3D_matching.py samples/comballaz-air2_5_DJI_0003_f2_img.png samples/comballaz-air2_7_DJI_0004_f2_img.png comballaz-air2_5_DJI_0003_f2_pc.npy --logdir logs/LCD-comballaz-mix --voxel_size 400 --radius 80 --num_points 1024
-
+    python3 -m apps.2D-3D_match.compute_2D_3D_matching.py samples/comballaz-air2_5_DJI_0003_f2_img.png samples/comballaz-air2_7_DJI_0004_f2_img.png samples/comballaz-air2_5_DJI_0003_f2_pc.npy --logdir logs/LCD-comballaz-mix --voxel_size 300 --radius 80 --num_points 1024
 
 **compute_2D_3D_matching_precision** : Compute matches for all 2 consecutives images and pointcloud in a specified folder and store all the found matches in a numpy persistant file
 

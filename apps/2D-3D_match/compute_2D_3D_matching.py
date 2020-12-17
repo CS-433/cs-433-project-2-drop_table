@@ -32,7 +32,7 @@ device = "cpu"
 fname = os.path.join(logdir, 'model.pth')
 
 
-print('> Loading model from {}....'.format(fname))
+print('> Loading pointnet from {}....'.format(fname))
 patchnet = PatchNetAutoencoder(
     config['embedding_size'],
     config['normalize']
@@ -185,7 +185,8 @@ pcd.colors = o3d.utility.Vector3dVector(colors_flatten[indices]/255)
 downsampled, patches1 = extract_uniform_patches(pcd, parse_args.voxel_size, parse_args.radius, parse_args.num_points)
 keypts1 = downsampled.points
 
-o3d.visualization.draw_geometries([downsampled])
+# Visualize the downsampled point cloud
+#o3d.visualization.draw_geometries([downsampled])
 
 
 desc1 = encode_3D(patches1, pointnet, batch_size=124, device=device)
