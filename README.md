@@ -174,6 +174,7 @@ Example :
 
 
 **Sample_train_comb** generate h5 datas ready to be used by the LCD from raw datas 
+
 Example :
 
     python3 -m scripts.sample_train_comb --directory epfl-trajectory --color EPFL2020-09-17_ --depth depth_ --startimage 0 --endimage 100 --savedir epfl-h5
