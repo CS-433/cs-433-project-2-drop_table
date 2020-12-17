@@ -29,9 +29,14 @@ model = PatchNetAutoencoder(
     args['embedding_size'],
     args['normalize']
 )
-model.load_state_dict(torch.load(fname)['patchnet'])
-model.to(device)
+
+if(device == "cuda"):
+    model.load_state_dict(torch.load(fname)['patchnet'])
+    model.to(device)
+else:
+    model.load_state_dict(torch.load(fname, map_location=torch.device(device))["patchnet"])
 model.eval()
+
 
 num_samples = 1024
 image_size = 64
@@ -90,9 +95,12 @@ def compute_lcd_descriptors(patches, model, batch_size, device):
     descriptors = []
     with torch.no_grad():
         for i, x in enumerate(batches):
-            x = x.to(device)
+            if(device == "cuda"):
+                x = x.to(device)
             z = model.encode(x)
-            z = z.cpu().numpy()
+            if(device == "cuda"):
+                z = z.cpu()
+            z = z.numpy()
             descriptors.append(z)
     return np.concatenate(descriptors, axis=0)
 
@@ -114,24 +122,3 @@ plt.tight_layout()
 plt.savefig("dcdd.pdf", bbox_inches='tight')
 plt.show()
 plt.close()
-
-# fig, ax = plt.subplots(2, 1, figsize=(6, 3))
-# ax[0].imshow(color0)
-# ax[0].axis('off')
-# ax[1].imshow(color1)
-# ax[1].axis('off')
-
-# queries = []
-# matched = []
-# for i, _ in enumerate(matches[:30]):
-#     if matches[i].queryIdx in queries: continue
-#     if matches[i].trainIdx in matched: continue
-#     matched.append(matches[i].trainIdx)
-#     queries.append(matches[i].queryIdx)
-#     con = ConnectionPatch(xyA=keypts0[matches[i].queryIdx].pt,
-#                           xyB=keypts1[matches[i].trainIdx].pt,
-#                           coordsA="data", coordsB="data",
-#                           axesA=ax[1], axesB=ax[0], color="red")
-#     ax[1].add_artist(con)
-# plt.savefig("kitti.pdf", bbox_inches='tight')
-# plt.show()

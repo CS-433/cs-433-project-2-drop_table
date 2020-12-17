@@ -31,8 +31,11 @@ model = PatchNetAutoencoder(
     args['embedding_size'],
     args['normalize']
 )
-model.load_state_dict(torch.load(fname)['patchnet'])
-model.to(device)
+if(device == "cuda"):
+    model.load_state_dict(torch.load(fname)['patchnet'])
+    model.to(device)
+else:
+    model.load_state_dict(torch.load(fname, map_location=torch.device(device))["patchnet"])
 model.eval()
 
 num_samples = 1024
@@ -56,9 +59,12 @@ def compute_lcd_descriptors(patches, model, batch_size, device):
     descriptors = []
     with torch.no_grad():
         for i, x in enumerate(batches):
-            x = x.to(device)
+            if(device == "cuda"):
+                x = x.to(device)
             z = model.encode(x)
-            z = z.cpu().numpy()
+            if(device == "cuda"):
+                z = z.cpu()
+            z = z.numpy()
             descriptors.append(z)
     return np.concatenate(descriptors, axis=0)
 
