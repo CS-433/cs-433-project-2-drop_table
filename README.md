@@ -165,12 +165,15 @@ Example :
 
 Usage :
 
+    python -m scripts.generate_depths --pose_file [npy file containing the positions] --data_path [trajectory path] --relative_pointcloud_path [Relative path inside the data path] --start_image [start data] --end_image [last data]
+
 Example :
 
-    python3 -m scripts.generate_depths --data_path data/comballaz/ --pose_file comballaz-phantom-survey_poses.npy --relative_pointcloud_path --directory_name comballaz-phantom-survey/ --start_image 0 --end_image 1500
+    python -m scripts.generate_depths --pose_file EPFL_2020-09-17_poses.npy --data_path epfl-trajectory --relative_pointcloud_path EPFL2020-09-17 --start_image 0 --end_image 100
 
-    
-**Sample_train_comb** generate h5 datas ready to be used by the LCD from raw datas, parameters *scenes*, *foc_x*, *foc_y*, *center_x*, *center_y* has to be changed in the code 
+
+
+**Sample_train_comb** generate h5 datas ready to be used by the LCD from raw datas with parameters *scenes*, *foc_x*, *foc_y*, *center_x*, *center_y*
 ## 3D-3D Match
 
 The script was given by the LCD's paper author, it is detailled on his repository.
