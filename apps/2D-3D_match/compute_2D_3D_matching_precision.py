@@ -18,6 +18,7 @@ from lcd import *
 parser = argparse.ArgumentParser()
 parser.add_argument('--logdir', help='path to the log directory')
 parser.add_argument('--imagesdir', help='path to the images directory')
+parser.add_argument('--save_file', help='name of the file in which saving the ')
 parser.add_argument("--voxel_size", default=100, type=float)
 parser.add_argument("--radius", default=540, type=float)
 parser.add_argument("--num_points", default=1024, type=int)
@@ -34,7 +35,7 @@ patchnet = PatchNetAutoencoder(
     config['embedding_size'],
     config['normalize']
 )
-if(device == "cuda"):
+if (device == "cuda"):
     patchnet.load_state_dict(torch.load(fname)['patchnet'])
     patchnet.to(device)
 else:
@@ -49,7 +50,7 @@ pointnet = PointNetAutoencoder(
     config["normalize"],
 )
 
-if(device == "cuda"):
+if (device == "cuda"):
     pointnet.load_state_dict(torch.load(fname)['pointnet'])
     pointnet.to(device)
 else :
@@ -78,10 +79,10 @@ def compute_lcd_descriptors(patches, model, batch_size, device):
     with torch.no_grad():
         for i, x in enumerate(batches):
             
-            if(device == "cuda"):
+            if (device == "cuda"):
                 x = x.to(device)
             z = model.encode(x)
-            if(device == "cuda"):
+            if (device == "cuda"):
                 z = z.cpu()
             z = z.numpy()
 
@@ -114,10 +115,10 @@ def encode_3D(patches, model, batch_size, device):
     with torch.no_grad():
         for i, x in enumerate(batches):
             print("   > Batch : ", i, "/" , len(batches))
-            if(device == "cuda"):
+            if (device == "cuda"):
                 x = x.to(device)
             z = model.encode(x)
-            if(device == "cuda"):
+            if (device == "cuda"):
                 z = z.cpu()
             z = z.numpy()
 
@@ -133,17 +134,22 @@ def open_image(rgb_file):
     return img1, source, source_array
 
 imagesdir = parse_args.imagesdir
-images_pairs = list(zip(range(1, 100), range(2, 101)))
-all_matches = np.empty((0,6), int)
 
+if (parse_args.imagesdir == "epfl-trajectory"):
+    images_pairs = list(zip(range(0, 100), range(1, 101)))
+else:
+    images_pairs = list(zip(range(1, 100), range(2, 101)))
+
+all_matches = np.empty((0,6), int)
 
 for image_nb0, image_nb1 in tqdm(images_pairs, desc='[Computation of 3D matches]'):
 
-    # image_path0 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb0))[0]
-    # image_path1 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb1))[0]
-
-    image_path0 = glob.glob(imagesdir + "/*_{:04d}_f2_img.png".format(image_nb0))[0]
-    image_path1 = glob.glob(imagesdir + "/*_{:04d}_f2_img.png".format(image_nb1))[0]
+    if (parse_args.imagesdir == "epfl-trajectory"):
+        image_path0 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb0))[0]
+        image_path1 = glob.glob(imagesdir + "/EPFL_2020-09-17_{}_*.png".format(image_nb1))[0]
+    else:
+        image_path0 = glob.glob(imagesdir + "/*_{:04d}_f2_img.png".format(image_nb0))[0]
+        image_path1 = glob.glob(imagesdir + "/*_{:04d}_f2_img.png".format(image_nb1))[0]
 
     color0 = cv.imread(image_path0)
     color0 = cv.cvtColor(color0,cv.COLOR_BGR2RGB)
@@ -170,26 +176,30 @@ for image_nb0, image_nb1 in tqdm(images_pairs, desc='[Computation of 3D matches]
 
     desc1 = encode_3D(patches1, pointnet, batch_size=124, device=device)
 
-    # RGB
+    # Pick at random num_samples pixels on the images
     keypts0 = []
     patches0 = []
     while len(keypts0) < num_samples:
         u0 = np.random.choice(color0.shape[1])
         v0 = np.random.choice(color0.shape[0])
 
+        # The coordinate of the pixel become a keypoint
         kp0 = (u0, v0)
         keypts0.append(kp0)
 
+        # We create a patch around each pixels
         patch0 = extract_color_patch(color0, u0, v0)
         patches0.append(patch0)
     
-
+    # Compute the descriptors for each patches
     desc0 = compute_lcd_descriptors(patches0, patchnet, batch_size=256, device=device)
 
+    # Create a ordered list of the best matches
     bf = cv.BFMatcher()
     matches = bf.match(desc0, desc1)
     matches = sorted(matches, key=lambda x:x.distance)
 
+    # Append the matches to all_matches
     for match in matches:
         index_query0, index_query1 = keypts0[match.queryIdx]
         key1 = keypts1[match.trainIdx]
@@ -198,7 +208,8 @@ for image_nb0, image_nb1 in tqdm(images_pairs, desc='[Computation of 3D matches]
 
         all_matches = np.vstack((all_matches, pair))
 
-save_file = "-EPFL-synth_2D-3D"
+# Export the matches int a file
+save_file = "-"+parse_args.save_file
 
 print("> Saving matches to {}".format(imagesdir+save_file))
 np.save(imagesdir+save_file, all_matches)

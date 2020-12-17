@@ -15,12 +15,12 @@ from lcd.models import *
 MANUAL_INPUT = True
 
 def manual_inputs():
-    scene_dir = "apps/2D-3D_match/rgbd-scenes-v2-scene_13"
+    scene_dir = "samples/rgbd-scenes-v2-scene_13_sample"
     intrinsics = os.path.join(scene_dir, "camera-intrinsics.txt")
     frames = os.path.join(scene_dir,"seq-01")
-    rgb = os.path.join(frames,"frame-000107.color.png")
-    rgb2 = os.path.join(frames,"frame-000107.color.png")
-    depth2 = os.path.join(frames,"frame-000107.depth.png")
+    rgb = os.path.join(frames,"frame-000043.color.png")
+    rgb2 = os.path.join(frames,"frame-000044.color.png")
+    depth2 = os.path.join(frames,"frame-000044.depth.png")
     return rgb, rgb2, depth2, intrinsics
 
 parser = argparse.ArgumentParser()
@@ -58,7 +58,7 @@ patchnet = PatchNetAutoencoder(
     config["normalize"],
 )
 
-if(device == "cuda"):
+if (device == "cuda"):
     patchnet.load_state_dict(torch.load(fname)['patchnet'])
     patchnet.to(device)
 else:
@@ -72,7 +72,7 @@ pointnet = PointNetAutoencoder(
     config["output_channels"],
     config["normalize"],
 )
-if(device == "cuda"):
+if (device == "cuda"):
     pointnet.load_state_dict(torch.load(fname)['pointnet'])
     pointnet.to(device)
 else :
@@ -93,10 +93,10 @@ def encode_2D(patches, patchnet, batch_size, device):
         for i, x in enumerate(batches):
             print("   > Batch : ", i, "/" , len(batches))
             
-            if(device == "cuda"):
+            if (device == "cuda"):
                 x = x.to(device)
-            z = model.encode(x)
-            if(device == "cuda"):
+            z = patchnet.encode(x)
+            if (device == "cuda"):
                 z = z.cpu()
             z = z.numpy()
 

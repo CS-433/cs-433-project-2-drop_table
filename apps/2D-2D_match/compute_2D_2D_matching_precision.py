@@ -75,7 +75,7 @@ imagesdir = parse_args.imagesdir
 if (parse_args.imagesdir == "epfl-trajectory"):
     images_pairs = list(zip(range(0, 100), range(1, 101)))
 else:
-    images_pairs = list(zip(range(1, 100), range(2, 3)))
+    images_pairs = list(zip(range(1, 100), range(2, 101)))
 
 
 all_matches = np.empty((0,6), int)
