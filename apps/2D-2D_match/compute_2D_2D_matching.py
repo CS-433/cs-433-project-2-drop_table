@@ -1,7 +1,6 @@
 import os
 import sys
 import json
-from tqdm import tqdm
 import argparse
 import cv2 as cv
 import numpy as np
@@ -74,8 +73,8 @@ image_size = 64
 half_patch_size = 32
 
 # Import both images
-color0 = cv.imread(parse_args.source)
-color1 = cv.imread(parse_args.target)
+color0 = cv.resize(cv.imread(parse_args.source), (720, 480))
+color1 = cv.resize(cv.imread(parse_args.target), (720, 480))
 
 keypts0 = []
 keypts1 = []
