@@ -13,7 +13,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--pairfile', help='path to file containing the 3d matching')
 args = parser.parse_args()
 
-threshold = 10
+threshold = 120
 
 pairfile = args.pairfile
 
@@ -30,5 +30,13 @@ distances = np.sqrt(np.sum((true_value - predictions)**2, axis=1))
 print(distances)
 
 isCorrect = np.count_nonzero(distances < threshold)
+
+x=range(1,100)
+
+plt.figure()
+y = [np.count_nonzero(distances < i)/ matchings.shape[0] for i in x]
+plt.plot(x, y)
+plt.tight_layout()
+plt.show()
 
 print("{} % of correct matching".format(100 * isCorrect / matchings.shape[0]))
