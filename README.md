@@ -29,6 +29,9 @@ To choose which version to train, simply rename the directory containing the sou
     matplotlib
     PIL
     glob
+    numpngw
+    ast
+    datetime
     open3d-python (version 0.7.0)
     
 
@@ -160,6 +163,13 @@ Example :
 
 **Generate Depths** generate depth images from imagex and coordinates given a directory
 
+Usage :
+
+Example :
+
+    python3 -m scripts.generate_depths --data_path data/comballaz/ --pose_file comballaz-phantom-survey_poses.npy --relative_pointcloud_path --directory_name comballaz-phantom-survey/ --start_image 0 --end_image 1500
+
+    
 **Sample_train_comb** generate h5 datas ready to be used by the LCD from raw datas, parameters *scenes*, *foc_x*, *foc_y*, *center_x*, *center_y* has to be changed in the code 
 ## 3D-3D Match
 

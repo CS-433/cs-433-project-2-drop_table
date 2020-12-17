@@ -5,6 +5,22 @@ import glob
 from tqdm import tqdm
 import argparse
 
+parser = argparse.ArgumentParser()
+
+parser.add_argument("--data_path", help="path to the data")
+parser.add_argument("--pose_file", help="name of the  pose file npy of the directory")
+parser.add_argument("--relative_pointcloud_path", help="Relative path to the pointcloud data")
+parser.add_argument("--directory_name", help="name of the directory containing the pose file and the point clouds, and the number of images")
+parser.add_argument("--start_image", help="number of the first image")
+parser.add_argument("--end_image", help="number of the image")
+
+args = parser.parse_args()
+data_path = args.data_path
+pose_file = args.pose_file
+relative_pointcloud_path = args.relative_pointcloud_path
+directory_name = args.directory_name
+start_image = args.start_image
+end_image = args.end_image
 def npy_to_py(path):
     a = np.load(path)
     return a
@@ -86,17 +102,17 @@ def py_to_png(depth_array, output_path):
     z = (65535*((depth_array - depth_array.min())/depth_array.ptp())).astype(np.uint16)
     numpngw.write_png(output_path, z)
 
-def read_one_dir(input_dir, number_of_images):
+def read_one_dir(input_dir, start_image, end_image, drone_file_name, data_path, relative_pointcloud_path):
     #The pose file of the directory
-    drone_file_name = "comballaz-phantom-survey_poses.npy"
+    drone_file_name = "pose_file"
 
     #The path to the data
-    path_to_data = "data/comballaz/" + input_dir
+    path_to_data = data_path + input_dir
     drones = npy_to_py(path_to_data + drone_file_name)
 
-    for j in tqdm(range(number_of_images), desc='[Computation of depth]'):
+    for j in tqdm(range(start_image, end_image), desc='[Computation of depth]'):
         #The path of the point cloud
-        relative_path = "comballaz-phantom-survey_"+str(j)+"_*.npy"
+        relative_path = relative_pointcloud_path+str(j)+"_*.npy"
         input_path = path_to_data+relative_path
         input_path = glob.glob(input_path)
         
@@ -108,4 +124,4 @@ def read_one_dir(input_dir, number_of_images):
         py_to_png(depth_array,output_path)
 
 #The name of the directory containing the pose file and the point clouds, and the number of images
-read_one_dir("comballaz-phantom-survey/", 1500)
+read_one_dir(directory_name, start_image, end_image, drone_file_name, data_path, relative_pointcloud_path)
