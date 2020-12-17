@@ -5,9 +5,6 @@ from tqdm import tqdm
 import argparse
 import cv2 as cv
 import numpy as np
-import matplotlib.pyplot as plt
-import matplotlib.pyplot as plt
-from matplotlib.patches import ConnectionPatch
 from PIL import Image
 import glob
 sys.path.append('.')

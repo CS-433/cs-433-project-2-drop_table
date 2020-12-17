@@ -20,11 +20,16 @@ To choose which version to train, simply rename the directory containing the sou
 
 Depending on your configuration, you may needs to change the line 12 in the train.py:
 1. If you are using a computer with less ram than the size of your training size :
-    from lcd.dataset import CrossTripletDataset
+
+        from lcd.dataset import CrossTripletDataset
+
 2. If you have a lot of ram and are generating your data with regulars pairs of corresponding images/patches :
-   from lcd.dataset_V1 import CrossTripletDataset
+
+        from lcd.dataset_V1 import CrossTripletDataset
+
 3. If you have a lot of ram are generating your data using LCD author's script as we explained in our report :
-    from lcd.dataset_V1 import CrossTripletDataset
+
+        from lcd.dataset_V1 import CrossTripletDataset
 
 You will also need to specify the path to your data in the config.json.
 You may also change the others parameters according to your needs.
@@ -50,7 +55,7 @@ Example :
     
     python3 apps.2D-2D_match.compute_2D_2D_matching.py samples/comballaz-air2_5_DJI_0003_f2_img.png samples/comballaz-air2_7_DJI_0004_f2_img.png --logdir logs/LCD-comballaz-mix --number_of_matches 20
 
-**compute_2D_2D_matching_precision** : Compute matches for all 2 consecutives files in a specified folders and store all the found matches in a numpy persistant file.
+**compute_2D_2D_matching_precision** : Compute matches for all 2 consecutives files in a specified folder and store all the found matches in a numpy persistant file.
 
 Usage : 
 
@@ -59,5 +64,7 @@ Usage :
 Example : 
 
 ## 2D-3D match
+
+**compute_2D_3D_matching_3D_match** : Compute matches for all 2 consecutives images and pointcloud in a specified folder and store all the found matches in a numpy persistant file
 
 ## sparse to dense point cloud
