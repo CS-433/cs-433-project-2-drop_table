@@ -23,6 +23,7 @@ To choose which version to train, simply rename the directory containing the sou
     json
     tqdm
     argparse
+    itertools
     cv2
     numpy
     matplotlib
@@ -155,6 +156,11 @@ Example :
 
     python3 -m apps.precision_tools.compare_precisions --dir precisions/2D-3D/comballaz/ --threshold_max 2000 --step 1
 
+## Others 
+
+**Generate Depths** generate depth images from imagex and coordinates given a directory
+
+**Sample_train_comb** generate h5 datas ready to be used by the LCD from raw datas, parameters *scenes*, *foc_x*, *foc_y*, *center_x*, *center_y* has to be changed in the code 
 ## 3D-3D Match
 
 The script was given by the LCD's paper author, it is detailled on his repository.
