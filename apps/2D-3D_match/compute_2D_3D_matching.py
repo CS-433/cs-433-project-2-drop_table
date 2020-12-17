@@ -60,6 +60,7 @@ else :
     pointnet.load_state_dict(torch.load(fname, map_location=torch.device(device))["pointnet"])
 pointnet.eval()
 
+# Parameters
 num_samples = 1024
 image_size = 64
 half_patch_size = 32

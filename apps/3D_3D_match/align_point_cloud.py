@@ -8,6 +8,7 @@ import matplotlib.pyplot as plt
 
 from lcd.models import *
 
+# Code from the LCD paper
 
 parser = argparse.ArgumentParser()
 parser.add_argument("source", help="path to the source point cloud")

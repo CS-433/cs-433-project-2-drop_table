@@ -6,7 +6,6 @@ import argparse
 import cv2 as cv
 import numpy as np
 import matplotlib.pyplot as plt
-import matplotlib.pyplot as plt
 from matplotlib.patches import ConnectionPatch
 from PIL import Image
 import glob
@@ -57,10 +56,10 @@ else :
     pointnet.load_state_dict(torch.load(fname, map_location=torch.device(device))["pointnet"])
 pointnet.eval()
 
+# Parameters
 num_samples = 1024
 image_size = 64
 half_patch_size = 32
-
 
 def extract_color_patch(color, u, v):
     xmin = max(u - half_patch_size, 0)
@@ -134,10 +133,9 @@ def open_image(rgb_file):
     return img1, source, source_array
 
 imagesdir = parse_args.imagesdir
-
 images_pairs = list(zip(range(1, 100), range(2, 101)))
-
 all_matches = np.empty((0,6), int)
+
 
 for image_nb0, image_nb1 in tqdm(images_pairs, desc='[Computation of 3D matches]'):
 

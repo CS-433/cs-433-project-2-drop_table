@@ -66,6 +66,8 @@ Usage :
 
 Example : 
 
+    python -m apps.2D-2D_match.compute_2D_2D_matching_precision --logdir logs\LCD-D256 --imagesdir comballaz-trajectory --save_file comballaz-D256
+
 ## 2D-3D match
 
 **compute_2D_3D_matching_3D_match** : Compute matches for all 2 consecutives images and pointcloud in a specified folder and store all the found matches in a numpy persistant file
