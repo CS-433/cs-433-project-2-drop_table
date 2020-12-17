@@ -35,10 +35,12 @@ patchnet = PatchNetAutoencoder(
     config['embedding_size'],
     config['normalize']
 )
-patchnet.load_state_dict(torch.load(fname)['patchnet'])
-patchnet.to(device)
+if(device == "cuda"):
+    patchnet.load_state_dict(torch.load(fname)['patchnet'])
+    patchnet.to(device)
+else:
+    patchnet.load_state_dict(torch.load(fname, map_location=torch.device(device))["patchnet"])
 patchnet.eval()
-
 
 print("> Loading pointnet from {}".format(fname))
 pointnet = PointNetAutoencoder(
@@ -48,8 +50,11 @@ pointnet = PointNetAutoencoder(
     config["normalize"],
 )
 
-pointnet.load_state_dict(torch.load(fname)['pointnet'])
-pointnet.to(device)
+if(device == "cuda"):
+    pointnet.load_state_dict(torch.load(fname)['pointnet'])
+    pointnet.to(device)
+else :
+    pointnet.load_state_dict(torch.load(fname, map_location=torch.device(device))["pointnet"])
 pointnet.eval()
 
 num_samples = 1024
@@ -73,9 +78,14 @@ def compute_lcd_descriptors(patches, model, batch_size, device):
     descriptors = []
     with torch.no_grad():
         for i, x in enumerate(batches):
-            x = x.to(device)
+            
+            if(device == "cuda"):
+                x = x.to(device)
             z = model.encode(x)
-            z = z.cpu().numpy()
+            if(device == "cuda"):
+                z = z.cpu()
+            z = z.numpy()
+
             descriptors.append(z)
     return np.concatenate(descriptors, axis=0)
 
@@ -105,9 +115,13 @@ def encode_3D(patches, model, batch_size, device):
     with torch.no_grad():
         for i, x in enumerate(batches):
             print("   > Batch : ", i, "/" , len(batches))
-            x = x.to(device)
+            if(device == "cuda"):
+                x = x.to(device)
             z = model.encode(x)
-            z = z.cpu().numpy()
+            if(device == "cuda"):
+                z = z.cpu()
+            z = z.numpy()
+
             descriptors.append(z)
     return np.concatenate(descriptors, axis=0)
 

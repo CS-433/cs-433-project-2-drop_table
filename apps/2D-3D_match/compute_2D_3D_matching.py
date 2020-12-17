@@ -30,8 +30,7 @@ parse_args = parser.parse_args()
 logdir = parse_args.logdir
 config = os.path.join(logdir, 'config.json')
 config = json.load(open(config))
-#device = config['device']
-device = "cpu"
+device = config['device']
 fname = os.path.join(logdir, 'model.pth')
 
 
@@ -40,9 +39,11 @@ patchnet = PatchNetAutoencoder(
     config['embedding_size'],
     config['normalize']
 )
-#patchnet.load_state_dict(torch.load(fname)['patchnet'])
-#patchnet.to(device)
-patchnet.load_state_dict(torch.load(fname, map_location=torch.device(device))["patchnet"])
+if(device == "cuda"):
+    patchnet.load_state_dict(torch.load(fname)['patchnet'])
+    patchnet.to(device)
+else:
+    patchnet.load_state_dict(torch.load(fname, map_location=torch.device(device))["patchnet"])
 patchnet.eval()
 
 
@@ -54,9 +55,11 @@ pointnet = PointNetAutoencoder(
     config["normalize"],
 )
 
-#pointnet.load_state_dict(torch.load(fname)['pointnet'])
-#pointnet.to(device)
-pointnet.load_state_dict(torch.load(fname, map_location=torch.device(device))["pointnet"])
+if(device == "cuda"):
+    pointnet.load_state_dict(torch.load(fname)['pointnet'])
+    pointnet.to(device)
+else :
+    pointnet.load_state_dict(torch.load(fname, map_location=torch.device(device))["pointnet"])
 pointnet.eval()
 
 num_samples = 1024
@@ -82,10 +85,13 @@ def compute_lcd_descriptors(patches, model, batch_size, device):
     with torch.no_grad():
         for i, x in enumerate(batches):
             print("   > Batch : ", i, "/" , len(batches))
-            #x = x.to(device)
+            if(device == "cuda"):
+                x = x.to(device)
             z = model.encode(x)
-            #z = z.cpu().numpy()
-            z = z.numpy()
+            if(device == "cuda"):
+                z = z.cpu().numpy()
+            else:
+                z = z.numpy()
             descriptors.append(z)
     return np.concatenate(descriptors, axis=0)
 
@@ -115,10 +121,13 @@ def encode_3D(patches, model, batch_size, device):
     with torch.no_grad():
         for i, x in enumerate(batches):
             print("   > Batch : ", i, "/" , len(batches))
-            #x = x.to(device)
+            if(device == "cuda"):
+                x = x.to(device)
             z = model.encode(x)
-            #z = z.cpu().numpy()
-            z = z.numpy()
+            if(device == "cuda"):
+                z = z.cpu().numpy()
+            else:
+                z = z.numpy()
             descriptors.append(z)
     return np.concatenate(descriptors, axis=0)
 

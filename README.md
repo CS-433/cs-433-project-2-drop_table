@@ -12,6 +12,10 @@ The bash scripts used to train the networks are in the "run scripts" folder.
 
 To choose which version to train, simply rename the directory containing the source code to lcd and the corresponding training script as "train.py".
 
+# Dependencies to install
+	
+	opencv-python
+
 # How to train the Network
 
 Depending on your configuration, you may needs to change the line 12 in the train.py:
@@ -24,6 +28,8 @@ Depending on your configuration, you may needs to change the line 12 in the trai
 
 You will also need to specify the path to your data in the config.json.
 You may also change the others parameters according to your needs.
+
+Warning : With loading all data in the RAM and Nvidia v100 GPUs, the differents trainings took us 17 hours each, you may want to run the trainings on cluster or powerfull device.
 
 We also provide a run.sh file designed to run the train.py script on EPFL's Izar cluster that run on slurm.
 

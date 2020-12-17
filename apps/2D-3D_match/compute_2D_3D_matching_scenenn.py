@@ -57,7 +57,12 @@ patchnet = PatchNetAutoencoder(
     config["embedding_size"],
     config["normalize"],
 )
-patchnet.load_state_dict(torch.load(fname, map_location=torch.device('cpu'))["patchnet"])
+
+if(device == "cuda"):
+    patchnet.load_state_dict(torch.load(fname)['patchnet'])
+    patchnet.to(device)
+else:
+    patchnet.load_state_dict(torch.load(fname, map_location=torch.device(device))["patchnet"])
 patchnet.eval()
 
 print("   > Loading pointnet from {}".format(fname))
@@ -67,7 +72,11 @@ pointnet = PointNetAutoencoder(
     config["output_channels"],
     config["normalize"],
 )
-pointnet.load_state_dict(torch.load(fname, map_location=torch.device('cpu'))["pointnet"])
+if(device == "cuda"):
+    pointnet.load_state_dict(torch.load(fname)['pointnet'])
+    pointnet.to(device)
+else :
+    pointnet.load_state_dict(torch.load(fname, map_location=torch.device(device))["pointnet"])
 pointnet.eval()
 
 def load_data(fname,i):
@@ -83,8 +92,14 @@ def encode_2D(patches, patchnet, batch_size, device):
     with torch.no_grad():
         for i, x in enumerate(batches):
             print("   > Batch : ", i, "/" , len(batches))
-            z = patchnet.encode(x)
+            
+            if(device == "cuda"):
+                x = x.to(device)
+            z = model.encode(x)
+            if(device == "cuda"):
+                z = z.cpu()
             z = z.numpy()
+
             descriptors.append(z)
     np_desc = np.concatenate(descriptors, axis=0)
     return np_desc
@@ -109,7 +124,11 @@ def encode_3D(patches, model, batch_size, device):
     with torch.no_grad():
         for i, x in enumerate(batches):
             print("   > Batch : ", i, "/" , len(batches))
+            if(device == "cuda"):
+                x = x.to(device)
             z = model.encode(x)
+            if(device == "cuda"):
+                z = z.cpu()            
             z = z.numpy()
             descriptors.append(z)
     return np.concatenate(descriptors, axis=0)
