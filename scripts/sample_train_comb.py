@@ -105,12 +105,10 @@ def sample_matching_pairs(scene):
 
     # Pick a random depth frame
     depth = np.array(Image.open(path+"depth_{}.png".format(frame))) * 0.001
-    #print(path+("img{:04d}.png").format(frame))
     img_path = glob.glob(path+("img{:04d}.png").format(frame))
     #color = np.array(Image.open(path+"EPFL-LHS_{}_LHS_img.png".format(frame)))
     color = np.array(Image.open(img_path[0]))
     #color = np.delete(color, 3, axis=2)
-    #print(depth)
     depth[depth > cutoff] = 0.0
 
     # Pick a random point P
@@ -146,7 +144,6 @@ def sample_matching_pairs(scene):
 
     patch = {}
     patch["cloud"] = extract_point_cloud(depth, color, x, y, p0, K)
-    #print(patch["cloud"])
     patch["color"] = extract_color_patch(color, x, y)
     return patch
 
