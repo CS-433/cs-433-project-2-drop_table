@@ -53,6 +53,8 @@ Warning : With loading all data in the RAM and Nvidia v100 GPUs, the differents 
 
 We also provide a run.sh file designed to run the train.py script on EPFL's Izar cluster that run on slurm.
 
+For more informations on the training, the LCD paper also have informations.
+
 # How to use a pretrained network
 
 Additionnaly to the authors's pretrained network, you can find in the folder logs/ the severals networks we trained as explained in our report. In all our application, the command line argument --logdir allows to choose which network to use.
@@ -115,7 +117,6 @@ Usage :
 Example :
     
     python -m apps.2D-3D_match.compute_2D_3D_matching_precision --logdir logs\LCD-comballaz_synth --imagesdir comballaz-trajectory --save_file comballaz-D256
-
 
 
 ## Sparse to dense point cloud
