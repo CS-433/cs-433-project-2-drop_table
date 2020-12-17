@@ -48,12 +48,12 @@ Depending on your configuration, you may needs to change the line 12 in the trai
 
 3. If you have a lot of ram are generating your data using LCD author's script as we explained in our report :
 
-        from lcd.dataset_V1 import CrossTripletDataset
+        from lcd.dataset_V2 import CrossTripletDataset
 
 You will also need to specify the path to your data in the config.json.
 You may also change the others parameters according to your needs.
 
-Warning : With loading all data in the RAM and Nvidia v100 GPUs, the differents trainings took us 17 hours each, you may want to run the trainings on cluster or powerfull device.
+Warning : With loading all data in the RAM and Nvidia v100 GPUs, the differents trainings took us 17 hours each, you may want to run the trainings on cluster or powerful device.
 
 We also provide a run.sh file designed to run the train.py script on EPFL's Izar cluster that run on slurm.
 
@@ -165,12 +165,20 @@ Example :
 
 Usage :
 
+    python3 -m scripts.generate_depths --pose_file [npy file containing the positions] --data_path [trajectory path] --relative_pointcloud_path [Relative path inside the data path] --start_image [start data] --end_image [last data]
+
 Example :
 
-    python3 -m scripts.generate_depths --data_path data/comballaz/ --pose_file comballaz-phantom-survey_poses.npy --relative_pointcloud_path --directory_name comballaz-phantom-survey/ --start_image 0 --end_image 1500
+    python3 -m scripts.generate_depths --pose_file EPFL_2020-09-17_ poses.npy --data_path epfl-trajectory --relative_pointcloud_path EPFL2020-09-17_ --start_image 0 --end_image 100
 
-    
-**Sample_train_comb** generate h5 datas ready to be used by the LCD from raw datas, parameters *scenes*, *foc_x*, *foc_y*, *center_x*, *center_y* has to be changed in the code 
+
+
+**Sample_train_comb** generate h5 datas ready to be used by the LCD from raw datas 
+Example :
+
+    python3 -m scripts.sample_train_comb --directory epfl-trajectory --color EPFL2020-09-17_ --depth depth_ --startimage 0 --endimage 100 --savedir epfl-h5
+
+*scenes*, *foc_x*, *foc_y*, *center_x*, *center_y*
 ## 3D-3D Match
 
 The script was given by the LCD's paper author, it is detailled on his repository.
