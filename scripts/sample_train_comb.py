@@ -6,13 +6,19 @@ import datetime
 import numpy as np
 from PIL import Image
 from itertools import chain
+import argparse
 
+parser = argparse.ArgumentParser()
+parser.add_argument('--directory', help='path to the images directory')
+parser.add_argument('--color', help='typical name of color')
+parser.add_argument('--depth', help='typical name of depth')
+parser.add_argument('--startimage', help="number of images")
+parser.add_argument('--endimage', help="number of images")
+parser.add_argument('--savedir', help='directory to save .h5')
+args = parser.parse_args()
 
-scenes = ["SURVEY"]
-
-root = "C:/Users/Eva.DESKTOP-21K26HC/Desktop/"
-dataset_size = 30000
-batch_size = 10000
+dataset_size = 1000
+batch_size = 100
 radius = 0.15
 cutoff = 100000
 cloud_size = 1024
@@ -25,28 +31,6 @@ center_x = 360
 center_y = 240
 
 camera_intrinsincs = [[foc_x, 0, center_x], [0, foc_y, center_y], [0, 0, 1]]
-
-def get_random_frame(scene):
-    if scene == "phantom/":
-        return np.random.randint(2, 1244)
-    elif scene == "EPFL-LSH/":
-        return np.random.randint(0, 15000)
-    elif scene == "comballaz-air2":
-        return np.random.randint(0, 1182)
-    elif scene == "comballaz-phantom-piloted":
-        return np.random.randint(0, 798)
-    elif scene == "comballaz-phantom-survey":
-        return np.random.randint(0, 447)
-    elif scene == "EPFL_piloted_2020_09_17":
-        return np.random.randint(0, 145)
-    elif scene == "EPFL_2020-09-17" or scene == "SURVEY":
-        return np.random.randint(0, 841)
-    elif scene == "EPFL_2020-09-24":
-        return np.random.randint(1, 1549)
-    elif scene == "EPFL_2020-11-11":
-        return np.random.randint(0, 623)
-    else:
-        return np.random.randint(2, 1181)
 
 def compute_bounding_box(p):
     return np.array(
@@ -99,16 +83,13 @@ def extract_color_patch(color, w, h):
 
 
 def sample_matching_pairs(scene):
-    frame = get_random_frame(scene)
+    frame = np.random.randint(startimage, endimage)
     K = np.array(camera_intrinsincs)
-    path = root + scene + "/"
 
     # Pick a random depth frame
-    depth = np.array(Image.open(path+"depth_{}.png".format(frame))) * 0.001
-    img_path = glob.glob(path+("img{:04d}.png").format(frame))
-    #color = np.array(Image.open(path+"EPFL-LHS_{}_LHS_img.png".format(frame)))
+    depth = np.array(Image.open(glob.glob(os.path.join(scene,"{}{}*.png".format(args.depth, frame)))[0])) * 0.001
+    img_path = glob.glob(os.path.join(scene,("{}{}*.png").format(args.color, frame)))
     color = np.array(Image.open(img_path[0]))
-    #color = np.delete(color, 3, axis=2)
     depth[depth > cutoff] = 0.0
 
     # Pick a random point P
@@ -125,9 +106,6 @@ def sample_matching_pairs(scene):
     p0 = np.array([x, y, z])
     b = compute_bounding_box(p0)
     if not np.all(b[:, 2]):
-        print(scene)
-        print(frame)
-        print("Div by 0")
         return None
     b[:, 0] = np.round(b[:, 0] * K[0, 0] / b[:, 2] + K[0, 2])
     b[:, 1] = np.round(b[:, 1] * K[1, 1] / b[:, 2] + K[1, 2])
@@ -136,10 +114,8 @@ def sample_matching_pairs(scene):
     x = np.array([np.min(b[:, 0]), np.max(b[:, 0])], dtype=np.int32)
     y = np.array([np.min(b[:, 1]), np.max(b[:, 1])], dtype=np.int32)
     if np.any(x < 0) or np.any(x >= depth.shape[1]):
-        print("some")
         return None
     if np.any(y < 0) or np.any(y >= depth.shape[0]):
-        print("some2")
         return None
 
     patch = {}
@@ -149,7 +125,6 @@ def sample_matching_pairs(scene):
 
 
 def save_batch_h5(fname, batch):
-    #patches = list(chain(*batch))
     indices = [len(sample) for sample in batch]
     indices = np.array(indices, dtype=np.int32)
     points = np.stack([patch["cloud"] for patch in batch])
@@ -159,12 +134,13 @@ def save_batch_h5(fname, batch):
     fp.create_dataset("images", data=images, compression="gzip")
     fp.close()
 
+startimage = args.startimage
+endimage = args.endimage
 
 size = 0
 batch = []
-#scene = "matching/plannedflights/"
+scene = args.directory
 while size < dataset_size:
-    scene = np.random.choice(scenes)
     sample = sample_matching_pairs(scene)
     if sample is None:
         continue
@@ -176,7 +152,7 @@ while size < dataset_size:
     # Save batch if needed
     if len(batch) == batch_size:
         i = size // batch_size
-        fname = "C:/Users/Eva.DESKTOP-21K26HC/Desktop/survey-real-h5/10/{:04d}.h5".format(i)
+        fname = os.path.join(args.savedir, "{:04d}.h5".format(i))
         print("> Saving batch to {}...".format(fname))
         save_batch_h5(fname, batch)
         batch = []
