@@ -18,9 +18,9 @@ parser.add_argument("source_image", help="path to the source image")
 parser.add_argument("destination_image", help="path to the destination image")
 parser.add_argument("destination_point_cloud", help="path to the destination depth map")
 parser.add_argument('--logdir', help='path to the log directory')
-parser.add_argument("--voxel_size", default=20, type=float)
-parser.add_argument("--radius", default=50, type=float)
-parser.add_argument("--num_points", default=1024, type=int)
+parser.add_argument("--voxel_size", default=20, type=float, help="Voxel size for the point cloud")
+parser.add_argument("--radius", default=50, type=float, help="Radius size for the point cloud")
+parser.add_argument("--num_points", default=1024, type=int, help="Number of patches per image")
 
 parse_args = parser.parse_args()
 
@@ -28,6 +28,7 @@ logdir = parse_args.logdir
 config = os.path.join(logdir, 'config.json')
 config = json.load(open(config))
 device = config['device']
+device = "cpu"
 fname = os.path.join(logdir, 'model.pth')
 
 
@@ -156,6 +157,7 @@ def from_2D_image_in_3D_space(source_array):
     return pcimg1
 
 
+# Load the images and the point cloud
 image_path0 = parse_args.source_image
 image_path1 = parse_args.destination_image
 pc_path1 = parse_args.destination_point_cloud
@@ -167,6 +169,7 @@ color1 = cv.cvtColor(color1,cv.COLOR_BGR2RGB)
 
 pc1 = np.load(pc_path1)
 
+# Map the Image 1 in a 3D space for the visualization
 _, _, source_array = open_image(image_path0)
 pc01 = from_2D_image_in_3D_space(source_array)
 
@@ -186,7 +189,7 @@ o3d.visualization.draw_geometries([downsampled])
 
 desc1 = encode_3D(patches1, pointnet, batch_size=124, device=device)
 
-# RGB
+# RGB image
 keypts0 = []
 patches0 = []
 while len(keypts0) < num_samples:
@@ -206,11 +209,12 @@ bf = cv.BFMatcher()
 matches = bf.match(desc0, desc1)
 matches = sorted(matches, key=lambda x:x.distance)
 
-
+# Creating a correspondence list to have line between keypoints
 correspondences = []
 for elem in matches:
     train_real_idx = keypts0[elem.queryIdx][1]* source_array.shape[1] + keypts0[elem.queryIdx][0]
     correspondences.append((train_real_idx,elem.trainIdx))
 
+# Visualizing the matching
 lineset = o3d.geometry.create_line_set_from_point_cloud_correspondences(pc01,downsampled,correspondences[:15])
 o3d.visualization.draw_geometries([pc01, downsampled, lineset])

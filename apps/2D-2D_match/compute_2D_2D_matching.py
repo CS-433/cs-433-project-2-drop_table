@@ -24,7 +24,6 @@ logdir = parse_args.logdir
 config = os.path.join(logdir, 'config.json')
 args = json.load(open(config))
 device = args['device']
-device = "cpu"
 
 # Import the Patchnet Auto Encoder
 fname = os.path.join(logdir, 'model.pth')
