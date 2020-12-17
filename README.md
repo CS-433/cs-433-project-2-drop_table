@@ -4,7 +4,7 @@
 
 The original repositery for the LCD network can be found [here](https://github.com/hkust-vgd/lcd).
 
-It corresponds to the lcd-base source code.
+The network described in it correspond to the lcd folder, and the train.py file in our repositery.
 
 We also have a modified version that uses pytorch-lightning to exploit multiple nodes on a cluster.
 
